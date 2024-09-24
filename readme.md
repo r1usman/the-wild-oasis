@@ -1,4 +1,4 @@
 # The Wild Oasis
 
-Main course in Jonas Schmedtmann's ultimate react course.
-built with react query and supabase
+Main course in Jonas Schmedtmann's Ultimate React Course.
+Built with react query and supabase
