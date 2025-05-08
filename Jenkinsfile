@@ -2,6 +2,13 @@ pipeline {
     agent any
 
     stages {
+        stage('Cleanup Docker and free DevOps folder') {
+            steps {
+                sh 'docker system prune -af' 
+                sh 'rm -r /var/lib/jenkins/DevOps/*'
+
+            }
+        }
         
         stage('Fetch code ') {
             steps {
