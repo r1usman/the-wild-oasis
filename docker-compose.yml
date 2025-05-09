@@ -3,7 +3,7 @@ version: "3.8"
 services:
   frontend:
     build: .
-    image: ru0300usman/myapp2:latest # Replace with your Docker Hub details
+    image: ru0300usman/myapp3:latest # Replace with your Docker Hub details
     ports:
       - "3000:80"
     depends_on:
