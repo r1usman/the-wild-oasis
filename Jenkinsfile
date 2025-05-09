@@ -4,7 +4,6 @@ pipeline {
     stages {
         stage('Cleanup Docker and free DevOps folder') {
             steps {
-                sh 'docker system prune -af' 
                sh '''
             if [ -d "/var/lib/jenkins/DevOps/" ]; then
                 find "/var/lib/jenkins/DevOps/" -mindepth 1 -delete
