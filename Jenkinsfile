@@ -1,7 +1,7 @@
 pipeline {
     agent any
 
-    // stages {
+    stages {
     //     stage('Cleanup Docker and free DevOps folder') {
     //         steps {
     //            sh '''
