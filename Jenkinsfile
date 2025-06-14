@@ -2,11 +2,16 @@ pipeline {
     agent any
 
     stages {
-        // Stage 1: Let Jenkins manage its own workspace
-        stage('Clean Workspace') {
+        stage('Delete PHP folder if it exists') {
             steps {
-                // This is the standard, safe way to ensure a clean build directory
-                cleanWs()
+                sh '''
+                    if [ -d "/var/lib/jenkins/DevOps/" ]; then
+                        find "/var/lib/jenkins/DevOps/" -mindepth 1 -delete
+                        echo "Contents of /var/lib/jenkins/DevOps/ have been removed."
+                    else
+                        echo "Directory /var/lib/jenkins/DevOps/ does not exist."
+                    fi
+                '''
             }
         }
 
