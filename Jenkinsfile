@@ -41,8 +41,6 @@ pipeline {
 
                 # Run tests inside Selenium + Chrome container
                 docker run --rm -v "$PWD/tests":/tests -w /tests python:3.12-slim /bin/bash -c "
-                    apt update &&
-                    apt install -y curl unzip chromium-driver chromium &&
                     pip install -r requirements.txt &&
                     pytest --maxfail=1 --disable-warnings -v
                 "
