@@ -30,65 +30,68 @@ pipeline {
             }
         }
 
-        // --- NEW TESTING STAGE ---
-        stage('Run Automated Tests') {
+        // --- CORRECTED TESTING PROCESS (SPLIT INTO TWO STAGES) ---
+
+        // Stage 4: Download the test code to the Jenkins host machine
+        stage('Checkout Test Code') {
             steps {
                 script {
-                    // Step 1: Create a clean directory for the test code and clone it
                     def testDir = "/var/lib/jenkins/DevOps/tests"
                     sh "rm -rf ${testDir} && mkdir -p ${testDir}"
                     
                     echo "Fetching test code from separate repository..."
                     // *** IMPORTANT: Change this URL to your test repository ***
                     sh "git clone https://github.com/r1usman/test-cases.git ${testDir}"
+                }
+            }
+        }
 
-                    // Step 2: Change into the test directory to run the tests inside Docker
-                    dir(testDir) {
-                        // This agent block creates a temporary Docker container just for this part
-                        agent {
-                            docker {
-                                image 'python:3.9-slim'
-                                // CRUCIAL: Allows the test container to connect to your app on localhost
-                                args '--network host'
-                            }
-                        }
-                        
-                        // These steps run inside the temporary python:3.9-slim container
-                        steps {
-                            echo 'Setting up the testing environment...'
+        // Stage 5: Run the tests from inside a clean Docker environment
+        stage('Execute Automated Tests') {
+            // The agent is now correctly defined at the top of the stage
+            agent {
+                docker {
+                    image 'python:3.9-slim'
+                    args '--network host'
+                    // This mounts the test directory from the host into the container
+                    args '-v /var/lib/jenkins/DevOps/tests:/tests'
+                }
+            }
+            steps {
+                // Change directory to the mounted test code inside the container
+                dir('/tests') {
+                    script {
+                        echo 'Setting up the testing environment...'
 
-                            // Install Chrome browser and its driver
-                            sh """
-                                apt-get update && apt-get install -y wget unzip gnupg
-                                wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
-                                sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-                                apt-get update
-                                apt-get install -y google-chrome-stable
-                                wget -O /tmp/chromedriver.zip https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/126.0.6478.61/linux64/chromedriver-linux64.zip
-                                unzip /tmp/chromedriver.zip -d /usr/bin
-                                mv /usr/bin/chromedriver-linux64/chromedriver /usr/bin/chromedriver
-                                chmod +x /usr/bin/chromedriver
-                            """
+                        // Install Chrome and its driver
+                        sh """
+                            apt-get update && apt-get install -y wget unzip gnupg
+                            wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+                            sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+                            apt-get update
+                            apt-get install -y google-chrome-stable
+                            wget -O /tmp/chromedriver.zip https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/126.0.6478.61/linux64/chromedriver-linux64.zip
+                            unzip /tmp/chromedriver.zip -d /usr/bin
+                            mv /usr/bin/chromedriver-linux64/chromedriver /usr/bin/chromedriver
+                            chmod +x /usr/bin/chromedriver
+                        """
 
-                            // Install Python dependencies
-                            echo 'Installing Python dependencies...'
-                            sh 'pip install -r requirements.txt'
+                        // Install Python dependencies
+                        echo 'Installing Python dependencies...'
+                        sh 'pip install -r requirements.txt'
 
-                            // Run tests using pytest
-                            echo 'Running Selenium tests...'
-                            sh 'pytest -v'
-                        }
+                        // Run the tests
+                        echo 'Running Selenium tests...'
+                        sh 'pytest -v'
                     }
                 }
             }
         }
     }
     
-    // --- NEW CLEANUP BLOCK ---
-    // This 'post' section runs after all stages are finished, regardless of success or failure
+    // --- CLEANUP BLOCK (UNCHANGED) ---
     post {
         always {
-            // This is a critical cleanup step to stop your application containers
             echo 'Stopping the Docker Compose application...'
             dir('/var/lib/jenkins/DevOps/php/') {
                 sh 'docker compose -p thereactapp down'
