@@ -40,7 +40,7 @@ pipeline {
                     
                     echo "Fetching test code from separate repository..."
                     // *** IMPORTANT: Change this URL to your test repository ***
-                    sh "https://github.com/r1usman/test-cases.git ${testDir}"
+                    sh "git clone https://github.com/r1usman/test-cases.git ${testDir}"
 
                     // Step 2: Change into the test directory to run the tests inside Docker
                     dir(testDir) {
