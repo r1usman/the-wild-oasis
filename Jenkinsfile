@@ -60,6 +60,7 @@ pipeline {
             }
             steps {
                 // Change directory to the mounted test code inside the container
+                echo "${/tests}"
                 dir('/tests') {
                     echo 'Setting up the testing environment...'
 
