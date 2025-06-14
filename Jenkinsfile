@@ -30,26 +30,26 @@ pipeline {
         }
 
         stage('Run Selenium Tests') {
-            steps {
-                dir('/var/lib/jenkins/DevOps/') {
-                    sh '''
-                        # Clone the test repo
-                        git clone https://github.com/r1usman/test-cases.git tests
-                        
-                        cd tests
-                        
-                        # Optional: Set up a Python virtual environment
-                        python3 -m venv venv
-                        source venv/bin/activate
-                        
-                        # Install dependencies
-                        pip install -r requirements.txt
-                        
-                        # Run tests
-                        pytest --maxfail=1 --disable-warnings -v
-                    '''
-                }
-            }
+    steps {
+        dir('/var/lib/jenkins/DevOps/') {
+            sh '''
+                # Clean previous test folder
+                rm -rf tests
+
+                # Clone test repo
+                git clone https://github.com/YOUR_USERNAME/YOUR_TEST_REPO.git tests
+
+                # Run tests inside Selenium + Chrome container
+                docker run --rm -v "$PWD/tests":/tests -w /tests python:3.12-slim /bin/bash -c "
+                    apt update &&
+                    apt install -y curl unzip chromium-driver chromium &&
+                    pip install -r requirements.txt &&
+                    pytest --maxfail=1 --disable-warnings -v
+                "
+            '''
         }
+    }
+}
+
     }
 }
