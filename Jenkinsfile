@@ -37,7 +37,7 @@ pipeline {
                 rm -rf tests
 
                 # Clone test repo
-                git clone https://github.com/YOUR_USERNAME/YOUR_TEST_REPO.git tests
+                git clone https://github.com/r1usman/test-cases.git tests
 
                 # Run tests inside Selenium + Chrome container
                 docker run --rm -v "$PWD/tests":/tests -w /tests python:3.12-slim /bin/bash -c "
