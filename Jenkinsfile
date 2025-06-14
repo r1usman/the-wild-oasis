@@ -60,8 +60,8 @@ pipeline {
             }
             steps {
                 // Change directory to the mounted test code inside the container
-                echo "${/tests}"
-                dir('/tests') {
+
+                dir(${testDir}) {
                     echo 'Setting up the testing environment...'
 
                     // This multi-line sh block will now execute correctly
