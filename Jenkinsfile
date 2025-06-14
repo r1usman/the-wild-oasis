@@ -40,7 +40,7 @@ pipeline {
                 git clone https://github.com/r1usman/test-cases.git tests
 
                 # Run tests inside Selenium + Chrome container
-                docker run --rm -v "$PWD/tests":/tests -w /tests yourdockerhubusername/selenium-python:latest pytest
+                docker run --rm -v "$PWD/tests":/tests -w /tests ru0300usman/selenium-python:latest pytest
             '''
         }
     }
