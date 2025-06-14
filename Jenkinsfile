@@ -47,8 +47,9 @@ pipeline {
         }
 
         // Stage 5: Run the tests from inside a clean Docker environment
+        // Stage 5: Run the tests from inside a clean Docker environment
         stage('Execute Automated Tests') {
-            // The agent is now correctly defined at the top of the stage
+            // The agent is correctly defined at the top of the stage
             agent {
                 docker {
                     image 'python:3.9-slim'
@@ -60,30 +61,29 @@ pipeline {
             steps {
                 // Change directory to the mounted test code inside the container
                 dir('/tests') {
-                    script {
-                        echo 'Setting up the testing environment...'
+                    echo 'Setting up the testing environment...'
 
-                        // Install Chrome and its driver
-                        sh """
-                            apt-get update && apt-get install -y wget unzip gnupg
-                            wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
-                            sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-                            apt-get update
-                            apt-get install -y google-chrome-stable
-                            wget -O /tmp/chromedriver.zip https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/126.0.6478.61/linux64/chromedriver-linux64.zip
-                            unzip /tmp/chromedriver.zip -d /usr/bin
-                            mv /usr/bin/chromedriver-linux64/chromedriver /usr/bin/chromedriver
-                            chmod +x /usr/bin/chromedriver
-                        """
+                    // This multi-line sh block will now execute correctly
+                    sh """
+                        set -e
+                        apt-get update && apt-get install -y wget unzip gnupg
+                        wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+                        sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+                        apt-get update
+                        apt-get install -y google-chrome-stable
+                        wget -O /tmp/chromedriver.zip https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/126.0.6478.61/linux64/chromedriver-linux64.zip
+                        unzip /tmp/chromedriver.zip -d /usr/bin
+                        mv /usr/bin/chromedriver-linux64/chromedriver /usr/bin/chromedriver
+                        chmod +x /usr/bin/chromedriver
+                    """
 
-                        // Install Python dependencies
-                        echo 'Installing Python dependencies...'
-                        sh 'pip install -r requirements.txt'
+                    // Install Python dependencies
+                    echo 'Installing Python dependencies...'
+                    sh 'pip install -r requirements.txt'
 
-                        // Run the tests
-                        echo 'Running Selenium tests...'
-                        sh 'pytest -v'
-                    }
+                    // Run the tests
+                    echo 'Running Selenium tests...'
+                    sh 'pytest -v'
                 }
             }
         }
