@@ -47,4 +47,17 @@ pipeline {
 }
 
     }
+    post {
+        always {
+            emailext (
+                subject: "Build ${currentBuild.fullDisplayName}",
+                body: """
+                    <p>Build Result: ${currentBuild.currentResult}</p>
+                    <p>Check console output at: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                """,
+                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
+                to: "ru0300usman@gmail.com"
+            )
+        }
+    }
 }
